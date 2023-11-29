@@ -1,21 +1,29 @@
 using Testing;
 
-namespace MSTest
+namespace NUnitProject
 {
-    [TestClass]
-    public class ATMTests
+    [TestFixture]
+    public class NUnitATMTests
     {
-        [TestMethod]
+        [SetUp]
+        public void Setup()
+        {
+        }
+
+        [Test]
         public void GetCommission()
         {
             var atmVisa = new ATM(1000, ATM.CardType.Visa);
             var atmMastercard = new ATM(1000, ATM.CardType.Mastercard);
-
-            Assert.AreEqual(ATMCommisions.Visa, atmVisa.GetCommission());
-            Assert.AreEqual(ATMCommisions.Mastercard, atmMastercard.GetCommission());
+            
+            Assert.Multiple(() =>
+            {
+                Assert.That(atmVisa.GetCommission(), Is.EqualTo(ATMCommisions.Visa));
+                Assert.That(atmMastercard.GetCommission(), Is.EqualTo(ATMCommisions.Mastercard));
+            });
         }
 
-        [TestMethod]
+        [Test]
         public void Deposit_ShouldAddToBalance()
         {
             decimal startingBalance = 100m;
@@ -24,20 +32,20 @@ namespace MSTest
             var atm = new ATM(startingBalance, ATM.CardType.Mastercard);
             atm.Deposit(depositAmount);
 
-            Assert.AreEqual(startingBalance + depositAmount, atm.Balance);
-            Assert.IsTrue(atm.Balance >= 0);
+            Assert.That(atm.Balance, Is.EqualTo(startingBalance + depositAmount));
+            Assert.That(atm.Balance, Is.GreaterThanOrEqualTo(0));
         }
 
-        [TestMethod]
+        [Test]
         public void Deposit_AmountLesserOrEqualZero()
         {
             var atm = new ATM(100m, ATM.CardType.Mastercard);
 
-            Assert.ThrowsException<ATMException>(() => atm.Deposit(0));
-            Assert.ThrowsException<ATMException>(() => atm.Deposit(-1));
+            Assert.Throws<ATMException>(() => atm.Deposit(0));
+            Assert.Throws<ATMException>(() => atm.Deposit(-1));
         }
 
-        [TestMethod]
+        [Test]
         public void Withdraw_ShouldRemoveFromBalance()
         {
             decimal startingBalance = 100m;
@@ -47,17 +55,17 @@ namespace MSTest
             atm.Withdraw(withdrawAmount);
 
             decimal endBalance = startingBalance - (withdrawAmount + withdrawAmount * atm.GetCommission());
-            Assert.AreEqual(endBalance, atm.Balance);
+            Assert.That(atm.Balance, Is.EqualTo(endBalance));
         }
 
-        [TestMethod]
+        [Test]
         public void Withdraw_InsufficientFunds()
         {
             decimal startingBalance = 10;
             int withdrawAmount = 20;
 
             var atm = new ATM(startingBalance, ATM.CardType.Visa);
-            Assert.ThrowsException<ATMException>(() => atm.Withdraw(withdrawAmount));
+            Assert.Throws<ATMException>(() => atm.Withdraw(withdrawAmount));
         }
     }
 }
