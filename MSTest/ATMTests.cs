@@ -9,7 +9,6 @@ namespace MSTest
         public void GetCommission_ShouldBeForVisa()
         {
             var atm = new ATM(1000, ATM.CardType.Visa);
-
             var commission = atm.GetCommission();
 
             Assert.AreEqual(ATMCommisions.Visa, commission);
@@ -19,7 +18,6 @@ namespace MSTest
         public void GetCommission_ShouldBeZeroForMastercard()
         {
             var atm = new ATM(1000, ATM.CardType.Mastercard);
-
             var comission = atm.GetCommission();
 
             Assert.AreEqual(ATMCommisions.Mastercard, comission);
@@ -39,6 +37,15 @@ namespace MSTest
         }
 
         [TestMethod]
+        public void Deposit_AmountLesserOrEqualZero()
+        {
+            var atm = new ATM(100m, ATM.CardType.Mastercard);
+
+            Assert.ThrowsException<ATMException>(() => atm.Deposit(0));
+            Assert.ThrowsException<ATMException>(() => atm.Deposit(-1));
+        }
+
+        [TestMethod]
         public void Withdraw_ShouldRemoveFromBalance()
         {
             decimal startingBalance = 100m;
@@ -49,6 +56,16 @@ namespace MSTest
 
             decimal endBalance = startingBalance - (withdrawAmount + withdrawAmount * atm.GetCommission());
             Assert.AreEqual(endBalance, atm.Balance);
+        }
+
+        [TestMethod]
+        public void Withdraw_InsufficientFunds()
+        {
+            decimal startingBalance = 10;
+            int withdrawAmount = 20;
+
+            var atm = new ATM(startingBalance, ATM.CardType.Visa);
+            Assert.ThrowsException<ATMException>(() => atm.Withdraw(withdrawAmount));
         }
     }
 }

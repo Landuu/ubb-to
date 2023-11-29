@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.ComponentModel;
-
-namespace Testing
+﻿namespace Testing
 {
     public class ATM(decimal balance, ATM.CardType card)
     {
@@ -15,14 +8,16 @@ namespace Testing
             Mastercard
         }
 
+        // Properties
         public decimal Balance { get; set; } = balance;
 
         public CardType Card { get; private set; } = card;
 
+        // Methods
         public void Deposit(int amount)
         {
             if (amount <= 0)
-                throw new Exception("Invalid amount");
+                throw new ATMException("Invalid amount");
 
             Balance += amount;
         }
@@ -31,7 +26,7 @@ namespace Testing
         {
             var totalWithCommission = amount + amount * GetCommission();
             if (Balance - totalWithCommission <= 0)
-                throw new Exception("Insufficient funds");
+                throw new ATMException("Insufficient funds");
 
             Balance -= totalWithCommission;
             return totalWithCommission;
@@ -43,10 +38,8 @@ namespace Testing
             {
                 CardType.Visa => ATMCommisions.Visa,
                 CardType.Mastercard => ATMCommisions.Mastercard,
-                _ => throw new Exception("Invalid card"),
+                _ => throw new ATMException("Invalid card"),
             };
         }
-
-
     }
 }
